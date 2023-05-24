@@ -1,0 +1,38 @@
+---
+ - name: Instalação das dependências da máquina
+   hosts: all
+   become: true
+   tasks:
+    - name: Atualização do sistema
+      apt:
+        upgrade: 'yes'
+        update_cache: true
+        cache_valid_time: 86400 #Um dia
+
+    - name: Instalação do cockpit
+      apt:
+        name: cockpit
+        state: latest
+
+    - name: Instalação do plugin de métricas do cockpit
+      apt:
+        name: cockpit-pcp
+        state: latest
+
+    - name: Habilitação do socket do cockpit
+      systemd:
+        name: cockpit.socket
+        state: started
+        enabled: true
+    
+    - name: Criação de usuário para acesso ao cockpit
+      user:
+        name: mastodoncio
+        password: "{{ 'password' | password_hash('sha512') }}"
+        groups: sudo
+        append: true
+        state: present
+        createhome: true
+        shell: /bin/bash
+        update_password: on_create
+      register: mastodoncio
