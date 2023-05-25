@@ -3,11 +3,32 @@
    hosts: all
    become: true
    tasks:
+
+    - name: Desabilitação (temporária) do AppArmor
+      systemd:
+        name: apparmor
+        state: stopped
+        enabled: false
+
     - name: Atualização do sistema
       apt:
         upgrade: 'yes'
         update_cache: true
-        cache_valid_time: 86400 #Um dia
+
+    - name: Instalação do UFW
+      apt:
+        name: ufw
+        state: latest
+
+    - name: Configuração das regras iniciais do UFW
+      ufw:
+        rule: allow
+        port: "22"
+
+    - name: Habilitação do UFW
+      ufw:
+        state: enabled
+        policy: reject
 
     - name: Instalação do cockpit
       apt:
@@ -36,3 +57,8 @@
         shell: /bin/bash
         update_password: on_create
       register: mastodoncio
+
+    - name: Liberação do Cockpit no UFW
+      ufw:
+        rule: allow
+        port: "9090"
