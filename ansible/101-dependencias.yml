@@ -2,49 +2,80 @@
  - name: Instalação das dependências da máquina
    hosts: all
    become: true
+   gather_facts: false
    tasks:
 
     - name: Desabilitação (temporária) do AppArmor
       systemd:
-        name: apparmor
+        name: "{{ item }}"
         state: stopped
         enabled: false
+      with_items:
+        - apparmor
 
     - name: Atualização do sistema
       apt:
         upgrade: 'yes'
-        update_cache: true
+        update_cache: yes
 
-    - name: Instalação do UFW
+    - name: Atualização de todos os pacotes do sistema
       apt:
-        name: ufw
+        name: "*"
         state: latest
 
-    - name: Configuração das regras iniciais do UFW
-      ufw:
-        rule: allow
-        port: "22"
+    - name: Remoção do UFW
+      package:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - ufw
 
-    - name: Habilitação do UFW
-      ufw:
+    - name: Instalação do Firewalld
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - firewalld
+
+    - name: Habilitação do socket do firewalld
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      with_items:
+        - firewalld
+
+    - name: Configuração da Zona Externa
+      firewalld:
+        zone: public
         state: enabled
-        policy: reject
+        interface: enp0s3
+        permanent: true
+        immediate: true
 
-    - name: Instalação do cockpit
-      apt:
-        name: cockpit
-        state: latest
+    - name: Configuração das regras iniciais do Firewalld
+      firewalld:
+        service: ssh
+        state: enabled
+        zone: public
+        immediate: true
+        permanent: true
 
-    - name: Instalação do plugin de métricas do cockpit
-      apt:
-        name: cockpit-pcp
+    - name: Instalação do cockpit e do plugin de métricas do cockpit
+      package:
+        name: "{{ item }}"
         state: latest
+      with_items:
+        - cockpit
+        - cockpit-pcp
 
     - name: Habilitação do socket do cockpit
       systemd:
-        name: cockpit.socket
+        name: "{{ item }}"
         state: started
         enabled: true
+      with_items:
+        - cockpit.socket
     
     - name: Criação de usuário para acesso ao cockpit
       user:
@@ -58,7 +89,12 @@
         update_password: on_create
       register: mastodoncio
 
-    - name: Liberação do Cockpit no UFW
-      ufw:
-        rule: allow
-        port: "9090"
+    - name: Liberação do Cockpit no Firewalld
+      firewalld:
+        service: "{{ item }}"
+        state: enabled
+        zone: public
+        immediate: true
+        permanent: true
+      with_items:
+        - cockpit

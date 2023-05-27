@@ -2,17 +2,21 @@
  - name: Instalação do Podman e suas dependências
    hosts: all
    become: true
+   gather_facts: false
    tasks:
 
-    - name: Instalação do UFW
-      apt:
-        name:
-          - podman
-          - cockpit-podman
+    - name: Instalação do Podman e do plugin para o Cockpit
+      package:
+        name: "{{ item }}"
         state: latest
+      with_items:
+        - podman
+        - cockpit-podman
 
     - name: Habilitação do Podman
       systemd:
-        name: podman
+        name: "{{ item }}"
         state: started
         enabled: true
+      with_items:
+        - podman
