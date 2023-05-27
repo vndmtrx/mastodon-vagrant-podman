@@ -1,0 +1,33 @@
+---
+ - name: Instalação do OpenVPN e suas dependências
+   hosts: all
+   become: true
+   gather_facts: false
+   tasks:
+
+    - name: Instalação das dependências do OpenVPN
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - apt-transport-https
+
+    - name: Instalação da chave pública do repositório do OpenVPN
+      apt_key:
+        url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+        state: present
+    
+    - name: Instalação do repositório do OpenVPN
+      apt_repository:
+        repo: deb https://swupdate.openvpn.net/community/openvpn3/repos lunar main
+        state: present
+        update_cache: yes
+
+    - name: Instalação do OpenVPN
+      package:
+        name: "{{ item }}"
+        state: latest
+        update_cache: yes
+      with_items:
+        - openvpn3
+        - easy-rsa

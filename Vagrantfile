@@ -18,5 +18,6 @@ Vagrant.configure("2") do |config|
 
     vps.vm.provision "ansible", playbook: "ansible/101-dependencias.yml"
     vps.vm.provision "ansible", playbook: "ansible/102-podman.yml"
+    vps.vm.provision "ansible", playbook: "ansible/103-openvpn.yml"
   end
 end
