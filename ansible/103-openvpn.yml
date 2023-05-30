@@ -55,7 +55,7 @@
           set_var EASYRSA_REQ_OU         "Mastodon"
           set_var EASYRSA_ALGO           "ec"
           set_var EASYRSA_DIGEST         "sha512"
-          set_var EASYRSA_REQ_CN         "Mastodon"
+          set_var EASYRSA_REQ_CN         "MastoServer"
 
     - name: Geração do CA com o easy-rsa
       command: /usr/share/easy-rsa/easyrsa --batch build-ca nopass
