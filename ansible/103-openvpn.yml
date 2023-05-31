@@ -37,12 +37,18 @@
         path: /opt/openvpn/easy-rsa/
         state: directory
     
-    - name: Criação do PKI com o easy-rsa
+    - name: Criação do PKI
       command: /usr/share/easy-rsa/easyrsa init-pki
       args:
         chdir: /opt/openvpn/easy-rsa/
         creates: /opt/openvpn/easy-rsa/pki
-    
+
+    - name: Geração do DH para negociação de chaves
+      command: /usr/share/easy-rsa/easyrsa gen-dh
+      args:
+        chdir: /opt/openvpn/easy-rsa/
+        creates: /opt/openvpn/easy-rsa/pki/dh.pem
+ 
     - name: Criação do env para o easy-rsa
       copy:
         dest: /opt/openvpn/easy-rsa/pki/vars
@@ -57,19 +63,19 @@
           set_var EASYRSA_DIGEST         "sha512"
           set_var EASYRSA_REQ_CN         "MastoServer"
 
-    - name: Geração do CA com o easy-rsa
+    - name: Geração da chave da autoridade certificadora
       command: /usr/share/easy-rsa/easyrsa --batch build-ca nopass
       args:
         chdir: /opt/openvpn/easy-rsa/
         creates: /opt/openvpn/easy-rsa/pki/ca.crt
 
-    - name: Geração da requisição do certificado do servidor com o easy-rsa
+    - name: Geração da requisição do certificado do servidor
       command: /usr/share/easy-rsa/easyrsa --batch gen-req mastoserver nopass
       args:
         chdir: /opt/openvpn/easy-rsa/
         creates: /opt/openvpn/easy-rsa/pki/reqs/mastoserver.req
 
-    - name: Assinatura do certificado do servidor com o easy-rsa
+    - name: Assinatura do certificado do servidor
       command: /usr/share/easy-rsa/easyrsa --batch sign-req server mastoserver
       args:
         chdir: /opt/openvpn/easy-rsa/
