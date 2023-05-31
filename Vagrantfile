@@ -3,7 +3,7 @@
 
 Vagrant.configure("2") do |config|
   
-  config.vm.synced_folder "./data", "/tmp/mastodoncio", create: true
+  config.vm.synced_folder "./data", "/opt/mastodoncio", create: true
 
   config.vm.define "vps" do |vps|
     vps.vm.box = "ubuntu/lunar64"

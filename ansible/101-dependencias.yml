@@ -23,6 +23,15 @@
         name: "*"
         state: latest
 
+    - name: Detecta necessidade de reboot
+      stat:
+        path: /var/run/reboot-required
+      register: reinicializacao
+
+    - name: Reinicialização do sistema
+      reboot:
+      when: reinicializacao.stat.exists
+
     - name: Remoção do UFW
       package:
         name: "{{ item }}"
@@ -76,7 +85,7 @@
         enabled: true
       with_items:
         - cockpit.socket
-    
+
     - name: Criação de usuário para acesso ao cockpit
       user:
         name: mastodoncio

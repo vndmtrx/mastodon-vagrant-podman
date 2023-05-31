@@ -34,24 +34,24 @@
     
     - name: Criação da pasta de geração das chaves privadas
       file:
-        path: /opt/openvpn/easy-rsa/
+        path: /opt/mastodoncio/openvpn/easy-rsa/
         state: directory
     
     - name: Criação do PKI
       command: /usr/share/easy-rsa/easyrsa init-pki
       args:
-        chdir: /opt/openvpn/easy-rsa/
-        creates: /opt/openvpn/easy-rsa/pki
+        chdir: /opt/mastodoncio/openvpn/easy-rsa/
+        creates: /opt/mastodoncio/openvpn/easy-rsa/pki
 
     - name: Geração do DH para negociação de chaves
       command: /usr/share/easy-rsa/easyrsa gen-dh
       args:
-        chdir: /opt/openvpn/easy-rsa/
-        creates: /opt/openvpn/easy-rsa/pki/dh.pem
+        chdir: /opt/mastodoncio/openvpn/easy-rsa/
+        creates: /opt/mastodoncio/openvpn/easy-rsa/pki/dh.pem
  
     - name: Criação do env para o easy-rsa
       copy:
-        dest: /opt/openvpn/easy-rsa/pki/vars
+        dest: /opt/mastodoncio/openvpn/easy-rsa/pki/vars
         content: |
           set_var EASYRSA_REQ_COUNTRY    "BR"
           set_var EASYRSA_REQ_PROVINCE   "Parana"
@@ -66,17 +66,17 @@
     - name: Geração da chave da autoridade certificadora
       command: /usr/share/easy-rsa/easyrsa --batch build-ca nopass
       args:
-        chdir: /opt/openvpn/easy-rsa/
-        creates: /opt/openvpn/easy-rsa/pki/ca.crt
+        chdir: /opt/mastodoncio/openvpn/easy-rsa/
+        creates: /opt/mastodoncio/openvpn/easy-rsa/pki/ca.crt
 
     - name: Geração da requisição do certificado do servidor
       command: /usr/share/easy-rsa/easyrsa --batch gen-req mastoserver nopass
       args:
-        chdir: /opt/openvpn/easy-rsa/
-        creates: /opt/openvpn/easy-rsa/pki/reqs/mastoserver.req
+        chdir: /opt/mastodoncio/openvpn/easy-rsa/
+        creates: /opt/mastodoncio/openvpn/easy-rsa/pki/reqs/mastoserver.req
 
     - name: Assinatura do certificado do servidor
       command: /usr/share/easy-rsa/easyrsa --batch sign-req server mastoserver
       args:
-        chdir: /opt/openvpn/easy-rsa/
-        creates: /opt/openvpn/easy-rsa/pki/issued/mastoserver.crt
+        chdir: /opt/mastodoncio/openvpn/easy-rsa/
+        creates: /opt/mastodoncio/openvpn/easy-rsa/pki/issued/mastoserver.crt
