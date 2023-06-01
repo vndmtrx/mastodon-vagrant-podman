@@ -34,25 +34,19 @@
 
     - name: Remoção do UFW
       package:
-        name: "{{ item }}"
+        name: ufw
         state: absent
-      with_items:
-        - ufw
 
     - name: Instalação do Firewalld
       package:
-        name: "{{ item }}"
+        name: firewalld
         state: latest
-      with_items:
-        - firewalld
 
     - name: Habilitação do socket do firewalld
       systemd:
-        name: "{{ item }}"
+        name: firewalld
         state: started
         enabled: true
-      with_items:
-        - firewalld
 
     - name: Configuração da Zona Externa
       firewalld:
@@ -80,11 +74,9 @@
 
     - name: Habilitação do socket do cockpit
       systemd:
-        name: "{{ item }}"
+        name: cockpit.socket
         state: started
         enabled: true
-      with_items:
-        - cockpit.socket
 
     - name: Criação de usuário para acesso ao cockpit
       user:
@@ -100,10 +92,8 @@
 
     - name: Liberação do Cockpit no Firewalld
       firewalld:
-        service: "{{ item }}"
+        service: cockpit
         state: enabled
         zone: public
         immediate: true
         permanent: true
-      with_items:
-        - cockpit

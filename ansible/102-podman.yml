@@ -15,8 +15,6 @@
 
     - name: Habilitação do Podman
       systemd:
-        name: "{{ item }}"
+        name: podman
         state: started
         enabled: true
-      with_items:
-        - podman
