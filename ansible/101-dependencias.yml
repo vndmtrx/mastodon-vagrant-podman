@@ -1,99 +1,91 @@
 ---
- - name: Instalação das dependências da máquina
-   hosts: all
-   become: true
-   gather_facts: false
-   tasks:
+- name: Instalação das dependências da máquina
+  hosts: all
+  become: true
+  gather_facts: false
 
-    - name: Desabilitação (temporária) do AppArmor
-      systemd:
-        name: "{{ item }}"
-        state: stopped
-        enabled: false
-      with_items:
-        - apparmor
+  tasks:
+  - name: Atualização do sistema
+    apt:
+      upgrade: 'yes'
+      update_cache: yes
 
-    - name: Atualização do sistema
-      apt:
-        upgrade: 'yes'
-        update_cache: yes
+  - name: Atualização de todos os pacotes do sistema
+    apt:
+      name: "*"
+      state: latest
 
-    - name: Atualização de todos os pacotes do sistema
-      apt:
-        name: "*"
-        state: latest
+  - name: Detecta necessidade de reboot
+    stat:
+      path: /var/run/reboot-required
+    register: reinicializacao
 
-    - name: Detecta necessidade de reboot
-      stat:
-        path: /var/run/reboot-required
-      register: reinicializacao
+  - name: Reinicialização do sistema
+    reboot:
+    when: reinicializacao.stat.exists
 
-    - name: Reinicialização do sistema
-      reboot:
-      when: reinicializacao.stat.exists
+  - name: Remoção do UFW
+    package:
+      name: ufw
+      state: absent
 
-    - name: Remoção do UFW
-      package:
-        name: ufw
-        state: absent
+  - name: Instalação do Firewalld
+    package:
+      name: firewalld
+      state: latest
 
-    - name: Instalação do Firewalld
-      package:
-        name: firewalld
-        state: latest
+  - name: Habilitação do socket do firewalld
+    systemd:
+      name: firewalld
+      state: started
+      enabled: true
 
-    - name: Habilitação do socket do firewalld
-      systemd:
-        name: firewalld
-        state: started
-        enabled: true
+  - name: Configuração da Zona Externa
+    firewalld:
+      zone: public
+      state: enabled
+      interface: enp0s3
+      permanent: true
+      immediate: true
 
-    - name: Configuração da Zona Externa
-      firewalld:
-        zone: public
-        state: enabled
-        interface: enp0s3
-        permanent: true
-        immediate: true
+  - name: Configuração das regras iniciais do Firewalld
+    firewalld:
+      service: ssh
+      state: enabled
+      zone: public
+      immediate: true
+      permanent: true
 
-    - name: Configuração das regras iniciais do Firewalld
-      firewalld:
-        service: ssh
-        state: enabled
-        zone: public
-        immediate: true
-        permanent: true
+  - name: Instalação do cockpit e do plugin de métricas do cockpit
+    package:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - cockpit
+      - cockpit-pcp
 
-    - name: Instalação do cockpit e do plugin de métricas do cockpit
-      package:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - cockpit
-        - cockpit-pcp
+  - name: Habilitação do socket do cockpit
+    systemd:
+      name: cockpit.socket
+      state: started
+      enabled: true
 
-    - name: Habilitação do socket do cockpit
-      systemd:
-        name: cockpit.socket
-        state: started
-        enabled: true
+  - name: Criação de usuário para acesso ao cockpit
+    user:
+      name: mastodoncio
+      password: "{{ 'password' | password_hash('sha512') }}"
+      groups: sudo
+      append: true
+      state: present
+      createhome: true
+      shell: /bin/bash
+      update_password: on_create
+    register: mastodoncio
 
-    - name: Criação de usuário para acesso ao cockpit
-      user:
-        name: mastodoncio
-        password: "{{ 'password' | password_hash('sha512') }}"
-        groups: sudo
-        append: true
-        state: present
-        createhome: true
-        shell: /bin/bash
-        update_password: on_create
-      register: mastodoncio
-
-    - name: Liberação do Cockpit no Firewalld
-      firewalld:
-        service: cockpit
-        state: enabled
-        zone: public
-        immediate: true
-        permanent: true
+  - name: Liberação do Cockpit no Firewalld
+    firewalld:
+      service: cockpit
+      state: enabled
+      zone: public
+      immediate: true
+      permanent: true
