@@ -1,41 +1,37 @@
 ---
- - name: Instalação das dependências da máquina
-   hosts: all
-   become: true
-   gather_facts: false
-   tasks:
+- name: Instalação das dependências da máquina
+  hosts: all
+  become: true
+  gather_facts: false
 
-    - name: Desabilitação (temporária) do AppArmor
-      systemd:
-        name: "{{ item }}"
-        state: stopped
-        enabled: false
-      with_items:
-        - apparmor
+  handlers:
+  - name: Reboot
+    reboot:
 
+  tasks:
     - name: Atualização do sistema
-      apt:
-        upgrade: 'yes'
-        update_cache: yes
-
-    - name: Atualização de todos os pacotes do sistema
-      apt:
+      package:
         name: "*"
         state: latest
 
-    - name: Detecta necessidade de reboot
-      stat:
-        path: /var/run/reboot-required
-      register: reinicializacao
-
-    - name: Reinicialização do sistema
-      reboot:
-      when: reinicializacao.stat.exists
-
-    - name: Remoção do UFW
+    - name: Instalação do dnf-utils
       package:
-        name: ufw
-        state: absent
+        name: dnf-utils
+        state: latest
+
+    - name: Bota o SELinux no modo permissivo, loga ações que podem ser bloqueadas
+      selinux:
+        policy: targeted
+        state: permissive
+
+    - name: Checa se um reboot é necessário
+      command: needs-restarting -r
+      register: reg_reboot_required
+      ignore_errors: yes
+      failed_when: false
+      changed_when: reg_reboot_required.rc != 0
+      notify:
+        - Reboot
 
     - name: Instalação do Firewalld
       package:
@@ -82,13 +78,13 @@
       user:
         name: mastodoncio
         password: "{{ 'password' | password_hash('sha512') }}"
-        groups: sudo
+        groups: wheel
         append: true
         state: present
         createhome: true
         shell: /bin/bash
         update_password: on_create
-      register: mastodoncio
+      register: reg_usuario
 
     - name: Liberação do Cockpit no Firewalld
       firewalld:
