@@ -3,7 +3,13 @@
 
 Vagrant.configure("2") do |config|
   
-  config.vm.synced_folder "./data", "/opt/mastodoncio", create: true
+  config.vm.synced_folder "./data", "/opt/mastodoncio/data",
+    create: true,
+    id: "data"
+  
+  config.vm.synced_folder "./docker", "/opt/mastodoncio/docker",
+    create: true,
+    id: "docker"
 
   config.vm.define "vps" do |vps|
     vps.vm.box = "almalinux/9"
