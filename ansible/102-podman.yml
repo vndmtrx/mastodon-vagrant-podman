@@ -1,20 +1,21 @@
 ---
- - name: Instalação do Podman e suas dependências
-   hosts: all
-   become: true
-   gather_facts: false
-   tasks:
+- name: Instalação do Podman e suas dependências
+  hosts: all
+  become: true
+  tasks:
 
-    - name: Instalação do Podman e do plugin para o Cockpit
-      package:
-        name: "{{ item }}"
-        state: latest
-      with_items:
-        - podman
-        - cockpit-podman
+  - name: Instalação do Podman, Podman-Compose e do plugin para o Cockpit
+    package:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - podman
+      - cockpit-podman
+      - podman-compose
+      - podman-docker
 
-    - name: Habilitação do Podman
-      systemd:
-        name: podman
-        state: started
-        enabled: true
+  - name: Habilitação do Podman
+    systemd:
+      name: podman
+      state: started
+      enabled: true
