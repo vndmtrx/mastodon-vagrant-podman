@@ -1,0 +1,7 @@
+---
+- name: Instalação do Mastodon
+  hosts: all
+  become: true
+  tasks:
+
+  
