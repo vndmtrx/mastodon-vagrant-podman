@@ -9,18 +9,18 @@
     reboot:
 
   tasks:
-    - name: Atualização do sistema
-      package:
-        name: "*"
-        state: latest
-
-    - name: Instalação do dnf-utils
+    - name: Instalação do dnf-utils e do epel-release
       package:
         name: "{{ item }}"
         state: latest
       with_items:
         - dnf-utils
         - epel-release
+
+    - name: Atualização do sistema
+      package:
+        name: "*"
+        state: latest
 
     - name: Bota o SELinux no modo permissivo, loga ações que podem ser bloqueadas
       selinux:
