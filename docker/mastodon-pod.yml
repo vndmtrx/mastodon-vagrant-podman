@@ -1,0 +1,37 @@
+# podman play kube mastodon-pod.yml --replace
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: mastodon
+  name: mastodon
+spec:
+  containers:
+    - name: postgres
+      image: docker.io/library/postgres
+      restart: always
+      livenessProbe:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - postgres
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      env:
+        - name: POSTGRES_DB
+          value: dev
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+    - name: redis
+      image: docker.io/library/redis
+      restart: always
+      livenessProbe:
+        exec:
+          command:
+            - redis-cli
+            - ping
+        initialDelaySeconds: 5
+        periodSeconds: 5
