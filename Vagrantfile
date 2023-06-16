@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
     create: true,
     id: "data"
   
-  config.vm.synced_folder "./docker", "/opt/mastodoncio/docker",
+  config.vm.synced_folder "./container-specs", "/opt/mastodoncio/container-specs",
     create: true,
     id: "docker"
 
