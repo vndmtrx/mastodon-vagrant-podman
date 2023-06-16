@@ -1,4 +1,4 @@
-# podman play kube mastodon-pod.yml --replace
+# podman play kube mastodon-pod.yml --configmap=mastodon-secrets.yml --replace
 apiVersion: v1
 kind: Pod
 metadata:
@@ -16,15 +16,24 @@ spec:
             - pg_isready
             - -U
             - postgres
-        initialDelaySeconds: 5
-        periodSeconds: 5
+        initialDelaySeconds: 45
+        periodSeconds: 15
       env:
         - name: POSTGRES_DB
-          value: dev
+          valueFrom:
+            configMapKeyRef:
+              name: PGDATA
+              key: POSTGRES_DB
         - name: POSTGRES_USER
-          value: postgres
+          valueFrom:
+            configMapKeyRef:
+              name: PGDATA
+              key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
-          value: postgres
+          valueFrom:
+            secretKeyRef:
+              name: PGSECRET
+              key: POSTGRES_PASSWORD
     - name: redis
       image: docker.io/library/redis
       restart: always
