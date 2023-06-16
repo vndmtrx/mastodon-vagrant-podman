@@ -1,2 +1,2 @@
-# mastodon-vagrant-docker :elephant:
-Script de deploy de uma instância Mastodon usando Vagrant, Ansible e Docker
+# mastodon-vagrant-podman :elephant:
+Script de deploy de uma instância Mastodon usando AlmaLinux, Vagrant, Ansible e Podman
