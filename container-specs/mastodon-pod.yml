@@ -11,6 +11,10 @@ spec:
       hostPath:
         path: /opt/mastodoncio/data/postgres
         type: DirectoryOrCreate
+    - name: pg-shm
+      emptyDir:
+        medium: Memory
+        sizeLimit: 1Gi
     - name: redis-storage
       hostPath:
         path: /opt/mastodoncio/data/redis
@@ -22,6 +26,8 @@ spec:
       volumeMounts:
         - name: pg-storage
           mountPath: /var/lib/postgresql/data
+        - name: pg-shm
+          mountPath: /dev/shm
       livenessProbe:
         exec:
           command:
