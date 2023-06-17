@@ -1,4 +1,4 @@
-# podman play kube mastodon-pod.yml --configmap=mastodon-secrets.yml --replace
+# podman kube play mastodon-pod.yml --configmap=mastodon-config.yml --replace
 apiVersion: v1
 kind: Pod
 metadata:
@@ -6,10 +6,22 @@ metadata:
     app: mastodon
   name: mastodon
 spec:
+  volumes:
+    - name: pg-storage
+      hostPath:
+        path: /opt/mastodoncio/data/postgres
+        type: DirectoryOrCreate
+    - name: redis-storage
+      hostPath:
+        path: /opt/mastodoncio/data/redis
+        type: DirectoryOrCreate
   containers:
     - name: postgres
       image: docker.io/library/postgres
       restart: always
+      volumeMounts:
+        - name: pg-storage
+          mountPath: /var/lib/postgresql/data
       livenessProbe:
         exec:
           command:
@@ -37,6 +49,9 @@ spec:
     - name: redis
       image: docker.io/library/redis
       restart: always
+      volumeMounts:
+        - name: redis-storage
+          mountPath: /data
       livenessProbe:
         exec:
           command:
