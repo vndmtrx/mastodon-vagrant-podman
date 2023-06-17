@@ -2,11 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  
-  config.vm.synced_folder "./data", "/opt/mastodoncio/data",
-    create: true,
-    id: "data"
-  
   config.vm.synced_folder "./container-specs", "/opt/mastodoncio/container-specs",
     create: true,
     id: "docker"
@@ -24,5 +19,6 @@ Vagrant.configure("2") do |config|
 
     vps.vm.provision "ansible", playbook: "ansible/101-dependencias.yml", config_file: "ansible/.ansible.cfg"
     vps.vm.provision "ansible", playbook: "ansible/102-podman.yml", config_file: "ansible/.ansible.cfg"
+    vps.vm.provision "ansible", playbook: "ansible/103-mastodon.yml", config_file: "ansible/.ansible.cfg"
   end
 end
