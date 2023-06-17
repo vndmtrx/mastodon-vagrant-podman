@@ -1,0 +1,8 @@
+# podman kube play mastodon-pod.yml --configmap=mastodon-config.yml --replace
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: PGDATA
+data:
+  POSTGRES_DB: dev
+  POSTGRES_USER: postgres
