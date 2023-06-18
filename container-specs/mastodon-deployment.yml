@@ -45,22 +45,9 @@ spec:
                 - postgres
             initialDelaySeconds: 45
             periodSeconds: 15
-          env:
-            - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: PGDATA
-                  key: POSTGRES_DB
-            - name: POSTGRES_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: PGDATA
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: PGSECRET
-                  key: POSTGRES_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: PGDATA
         - name: redis
           image: docker.io/library/redis
           restartPolicy: Always
