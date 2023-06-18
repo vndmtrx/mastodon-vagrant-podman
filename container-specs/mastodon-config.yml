@@ -6,3 +6,4 @@ metadata:
 data:
   POSTGRES_DB: dev
   POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: senhabemsecreta
