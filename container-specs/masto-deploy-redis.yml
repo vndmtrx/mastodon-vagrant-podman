@@ -1,0 +1,36 @@
+# podman kube play masto-deploy-redis.yml --configmap=mastodon-config.yml --replace
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: masto-redis
+  name: masto-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: masto-redis
+  template:
+    metadata:
+      labels:
+        app: masto-redis
+    spec:
+      volumes:
+        - name: redis-storage
+          hostPath:
+            path: /opt/mastodoncio/data/redis
+            type: DirectoryOrCreate
+      containers:
+        - name: redis
+          image: docker.io/library/redis
+          restartPolicy: Always
+          volumeMounts:
+            - name: redis-storage
+              mountPath: /data
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
