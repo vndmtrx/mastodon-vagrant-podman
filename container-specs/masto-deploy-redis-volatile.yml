@@ -1,0 +1,28 @@
+# podman kube play masto-deploy-redis-volatile.yml --configmap=mastodon-config.yml --replace
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: masto-redis-volatile
+  name: masto-redis-volatile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: masto-redis-volatile
+  template:
+    metadata:
+      labels:
+        app: masto-redis-volatile
+    spec:
+      containers:
+        - name: redis
+          image: docker.io/library/redis
+          restartPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
