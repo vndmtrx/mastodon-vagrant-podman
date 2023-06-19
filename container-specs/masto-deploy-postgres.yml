@@ -1,0 +1,46 @@
+# podman kube play masto-deploy-postgres.yml --configmap=mastodon-config.yml --replace
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: masto-pg
+  name: masto-pg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: masto-pg
+  template:
+    metadata:
+      labels:
+        app: masto-pg
+    spec:
+      volumes:
+        - name: pg-storage
+          hostPath:
+            path: /opt/mastodoncio/data/postgres
+            type: DirectoryOrCreate
+        - name: pg-shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres
+          restartPolicy: Always
+          volumeMounts:
+            - name: pg-storage
+              mountPath: /var/lib/postgresql/data
+            - name: pg-shm
+              mountPath: /dev/shm
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - postgres
+            initialDelaySeconds: 45
+            periodSeconds: 15
+          envFrom:
+            - configMapRef:
+                name: PGDATA
