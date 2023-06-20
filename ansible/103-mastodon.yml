@@ -5,7 +5,7 @@
   tasks:
   
   - name: Instalação dos pods dos serviços
-    shell: podman kube play "{{item}}" --configmap=mastodon-config.yml --replace
+    shell: podman kube play "{{ item }}" --configmap=mastodon-config.yml --replace
     args:
       chdir: /opt/mastodoncio/container-specs/
     with_items:
