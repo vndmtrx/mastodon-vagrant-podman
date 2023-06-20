@@ -3,3 +3,12 @@
   hosts: all
   become: true
   tasks:
+  
+  - name: Instalação dos pods dos serviços
+    shell: podman kube play "{{item}}" --configmap=mastodon-config.yml --replace
+    args:
+      chdir: /opt/mastodoncio/container-specs/
+    with_items:
+      - masto-deploy-postgres.yml
+      - masto-deploy-redis.yml
+      - masto-deploy-redis-volatile.yml
