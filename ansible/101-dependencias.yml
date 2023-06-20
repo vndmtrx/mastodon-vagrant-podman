@@ -73,9 +73,12 @@
 
     - name: Habilitação do socket do cockpit
       systemd:
-        name: cockpit.socket
+        name: "{{ item }}"
         state: started
         enabled: true
+      with_items:
+        - cockpit.socket
+        - pmlogger.service
 
     - name: Criação de usuário para acesso ao cockpit
       user:
