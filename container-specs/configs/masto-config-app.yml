@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: APP
+data:
+  POSTGRES_DB: dev
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: senhabemsecreta
