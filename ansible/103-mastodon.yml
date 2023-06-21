@@ -12,3 +12,4 @@
       - masto-deploy-postgres.yml
       - masto-deploy-redis.yml
       - masto-deploy-redis-volatile.yml
+      - masto-deploy-redis-elasticsearch.yml

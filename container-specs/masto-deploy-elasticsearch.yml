@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: masto-es
+  name: masto-es
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: masto-es
+  template:
+    metadata:
+      labels:
+        app: masto-es
+    spec:
+      volumes:
+        - name: es-storage
+          hostPath:
+            path: /opt/mastodoncio/data/elasticsearch
+            type: DirectoryOrCreate
+      containers:
+        - name: elasticsearch
+          image: docker.io/library/elasticsearch:8.8.1
+          restartPolicy: Always
+          volumeMounts:
+            - name: pg-storage
+              mountPath: /usr/share/elasticsearch/data
+          livenessProbe:
+            tcpSocket:
+              port: 9300
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          envFrom:
+            - configMapRef:
+                name: DATABASE
