@@ -34,3 +34,6 @@ spec:
                 - ping
             initialDelaySeconds: 5
             periodSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: DATABASE
