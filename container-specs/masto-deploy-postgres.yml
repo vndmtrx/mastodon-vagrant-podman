@@ -43,4 +43,4 @@ spec:
             periodSeconds: 15
           envFrom:
             - configMapRef:
-                name: PGDATA
+                name: DATABASE
