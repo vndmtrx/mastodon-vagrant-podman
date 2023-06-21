@@ -4,8 +4,8 @@
   become: true
   tasks:
   
-  - name: Instalação dos pods dos serviços
-    shell: podman kube play "{{ item }}" --configmap=mastodon-config.yml --replace
+  - name: Instalação dos pods dos serviços Postgres e Redis
+    shell: podman kube play "{{ item }}" --configmap=configs/masto-config-db.yml --replace
     args:
       chdir: /opt/mastodoncio/container-specs/
     with_items:
