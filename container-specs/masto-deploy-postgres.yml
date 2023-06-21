@@ -1,4 +1,3 @@
-# podman kube play masto-deploy-postgres.yml --configmap=mastodon-config.yml --replace
 apiVersion: apps/v1
 kind: Deployment
 metadata:
